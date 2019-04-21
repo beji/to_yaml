@@ -79,4 +79,11 @@ defmodule ToYamlTest do
     result = input |> ToYaml.to_yaml() |> list_to_string()
     assert result == expected
   end
+
+  test "to_value inserts \" when needed" do
+    input1 = "bla bla"
+    input2 = "bla:bla"
+    assert ToYaml.to_value(0, input1) == [" ", "\"bla bla\"", "\n"]
+    assert ToYaml.to_value(0, input2) == [" ", "\"bla:bla\"", "\n"]
+  end
 end

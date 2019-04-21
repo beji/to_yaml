@@ -1,12 +1,50 @@
 defmodule ToYaml do
   @moduledoc """
-  Documentation for ToYaml.
+  `ToYaml` is a simple module that converts a `map()` to an `iolist()` that will hopefully turn in to the expected [YAML](https://yaml.org/) output when printed as a string or written into a file.
+  `to_yaml/1` should serve as the main entry point here.
+
+  This allows you to write something like
+  ```
+  %{
+    :apiVersion => "v1",
+    :kind => "Service",
+    :metadata => %{
+      :name => "fancy-name"
+    },
+    :spec => %{
+      :ports => [
+        %{
+          :port => 80,
+          :targetPort => 3000
+        }
+      ],
+      :selector => %{
+        :app => "fancy-name"
+      }
+    }
+  }
+  ```
+  and have it turned into
+  ```
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: fancy-name
+  spec:
+    ports:
+      - port: 80
+        targetPort: 3000
+    selector:
+      app: fancy-name
+  ```
   """
 
   @spacer Application.get_env(:to_yaml, :spacer)
   @spacerwidth Application.get_env(:to_yaml, :spacerwidth)
 
   @doc """
+  Takes a given map and tries to turn it into an IO List based YAML representation of itself.
+  This is actually an alias of `to_yaml/2` with the level parameter set to 0.
 
   ## Examples
     iex> ToYaml.to_yaml(%{"hello" => "world"})
@@ -20,6 +58,8 @@ defmodule ToYaml do
   def to_yaml(input) when is_map(input), do: to_yaml(0, input)
 
   @doc """
+  Takes a given map and tries to turn it into an IO List based YAML representation of itself.
+  The level parameter is used to control the indentation of the YAML output with the help of `indent_level/1`
 
   ## Examples
     iex> ToYaml.to_yaml(0, %{"hello" => "world"})
@@ -36,7 +76,10 @@ defmodule ToYaml do
     end)
   end
 
+  # TODO: The given keys might contain spaces or ':' characters, both aren't valid in this context I think
   @doc """
+  Turns a map key into a YAML key. This currently only handles `String.t()` or `atom()` as the given input types as they are the only ones valid for yaml.
+  This currently doesn't do any kind of input validation besides basic type matching.
 
   ## Examples
     iex> ToYaml.to_key("test")
@@ -50,6 +93,14 @@ defmodule ToYaml do
 
   def to_key(key) when is_bitstring(key), do: key
 
+  @doc """
+  Turns a given value in to the corresponding IO List representation for YAML files. This will prepend a space before the given value and a newline after the input.
+  - If given a number it will turn the number into a string and return that with a space before and a newline after the input.
+  - If given a string it will return the input with a space before and a newline after the input. It will also add quotation marks around the input if that happens to contain a `:` or a ` `.
+  - If given a map it will do a call to `to_yaml/2` to get the IO List representation of that.
+  - If given a list it will render a YAML list.
+  - If given anything else it will just return the input with a space before and a newline after it.
+  """
   @spec to_value(number(), any()) :: iolist()
   def to_value(level, value) when is_map(value), do: ["\n", to_yaml(level + 1, value)]
 
@@ -73,6 +124,7 @@ defmodule ToYaml do
     ]
   end
 
+  # TODO: There could be newlines or something funny in the value field
   def to_value(_level, value) when is_bitstring(value) do
     if String.contains?(value, [" ", ":"]) do
       [" ", "\"#{value}\"", "\n"]
@@ -96,6 +148,8 @@ defmodule ToYaml do
   end
 
   @doc """
+  Turns the given indentation level to a string that will represent that indentation.
+  This can be configured by overriding `config :to_yaml, :spacer` and `config :to_yaml, :spacerwidth`
 
   ## Examples
     iex> ToYaml.indent_level(0)
