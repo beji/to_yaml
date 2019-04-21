@@ -1,7 +1,7 @@
 defmodule ToYaml do
   @moduledoc """
-  `ToYaml` is a simple module that converts a `map()` to an `iolist()` that will maybe at some point in the far future turn in to the expected [YAML](https://yaml.org/) output when printed as a string or written into a file.
-  Right now it just outputs a very simple subset of the spec.
+  `ToYaml` is a simple module that converts a `map()` to an `iolist()` that will turn in to the expected [YAML](https://yaml.org/) output when printed as a string or written into a file.
+  This does not aim to implement a full spec implementation but a subset that should be enough for use cases like k8s or docker-compose.
   `to_yaml/1` should serve as the main entry point here.
 
   This allows you to write something like
