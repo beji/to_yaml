@@ -3,3 +3,7 @@ list:
     sub: yeah
   - keytwo: valuetwo
     sub: wooo
+otherlist:
+  - 1
+  - 2
+  - jeppp

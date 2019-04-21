@@ -1,6 +1,7 @@
 defmodule ToYaml do
   @moduledoc """
-  `ToYaml` is a simple module that converts a `map()` to an `iolist()` that will hopefully turn in to the expected [YAML](https://yaml.org/) output when printed as a string or written into a file.
+  `ToYaml` is a simple module that converts a `map()` to an `iolist()` that will maybe at some point in the far future turn in to the expected [YAML](https://yaml.org/) output when printed as a string or written into a file.
+  Right now it just outputs a very simple subset of the spec.
   `to_yaml/1` should serve as the main entry point here.
 
   This allows you to write something like
@@ -107,19 +108,27 @@ defmodule ToYaml do
   def to_value(level, value) when is_list(value) do
     [
       "\n",
-      Enum.map(value, fn map ->
-        [{head_k, head_v} | tail] = Map.to_list(map)
+      Enum.map(value, fn value ->
+        if is_map(value) do
+          [{head_k, head_v} | tail] = Map.to_list(value)
 
-        [
-          indent_level(level + 1),
-          "- ",
-          to_key(head_k),
-          ":",
-          to_value(level + 1, head_v),
-          Enum.map(tail, fn {k, v} ->
-            [indent_level(level + 2), to_key(k), ":", to_value(level + 2, v)]
-          end)
-        ]
+          [
+            indent_level(level + 1),
+            "- ",
+            to_key(head_k),
+            ":",
+            to_value(level + 1, head_v),
+            Enum.map(tail, fn {k, v} ->
+              [indent_level(level + 2), to_key(k), ":", to_value(level + 2, v)]
+            end)
+          ]
+        else
+          [
+            indent_level(level + 1),
+            "-",
+            to_value(level + 1, value)
+          ]
+        end
       end)
     ]
   end

@@ -47,7 +47,8 @@ defmodule ToYamlTest do
           :keytwo => "valuetwo",
           :sub => "wooo"
         }
-      ]
+      ],
+      :otherlist => [1, 2, "jeppp"]
     }
 
     expected = File.read!("#{@testfiledir}/list.yaml")
