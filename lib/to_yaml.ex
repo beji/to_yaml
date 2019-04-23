@@ -43,31 +43,31 @@ defmodule ToYaml do
   @spacer Application.get_env(:to_yaml, :spacer)
   @spacerwidth Application.get_env(:to_yaml, :spacerwidth)
 
-  @doc """
+  @doc ~S"""
   Takes a given map and tries to turn it into an IO List based YAML representation of itself.
   This is actually an alias of `to_yaml/2` with the level parameter set to 0.
 
   ## Examples
-    iex> ToYaml.to_yaml(%{"hello" => "world"})
-    [["", "hello", ":", [" ", "world", "\\n"]]]
+      iex> ToYaml.to_yaml(%{"hello" => "world"})
+      [["", "hello", ":", [" ", "world", "\n"]]]
 
-    iex> ToYaml.to_yaml(%{:hello => "world"})
-    [["", "hello", ":", [" ", "world", "\\n"]]]
+      iex> ToYaml.to_yaml(%{:hello => "world"})
+      [["", "hello", ":", [" ", "world", "\n"]]]
   """
 
   @spec to_yaml(map()) :: iolist()
   def to_yaml(input) when is_map(input), do: to_yaml(0, input)
 
-  @doc """
+  @doc ~S"""
   Takes a given map and tries to turn it into an IO List based YAML representation of itself.
   The level parameter is used to control the indentation of the YAML output with the help of `indent_level/1`
 
   ## Examples
-    iex> ToYaml.to_yaml(0, %{"hello" => "world"})
-    [["", "hello", ":", [" ", "world", "\\n"]]]
+      iex> ToYaml.to_yaml(0, %{"hello" => "world"})
+      [["", "hello", ":", [" ", "world", "\n"]]]
 
-    iex> ToYaml.to_yaml(1, %{:hello => "world"})
-    [["  ", "hello", ":", [" ", "world", "\\n"]]]
+      iex> ToYaml.to_yaml(1, %{:hello => "world"})
+      [["  ", "hello", ":", [" ", "world", "\n"]]]
   """
   @spec to_yaml(number(), map()) :: iolist()
   def to_yaml(level, input) when is_number(level) and is_map(input) do
@@ -78,16 +78,16 @@ defmodule ToYaml do
   end
 
   # TODO: The given keys might contain spaces or ':' characters, both aren't valid in this context I think
-  @doc """
+  @doc ~S"""
   Turns a map key into a YAML key. This currently only handles `String.t()` or `atom()` as the given input types as they are the only ones valid for yaml.
   This currently doesn't do any kind of input validation besides basic type matching.
 
   ## Examples
-    iex> ToYaml.to_key("test")
-    "test"
+      iex> ToYaml.to_key("test")
+      "test"
 
-    iex> ToYaml.to_key(:test)
-    "test"
+      iex> ToYaml.to_key(:test)
+      "test"
   """
   @spec to_key(String.t() | atom()) :: String.t()
   def to_key(key) when is_atom(key), do: Atom.to_string(key)
@@ -156,19 +156,19 @@ defmodule ToYaml do
     end
   end
 
-  @doc """
+  @doc ~S"""
   Turns the given indentation level to a string that will represent that indentation.
   This can be configured by overriding `config :to_yaml, :spacer` and `config :to_yaml, :spacerwidth`
 
   ## Examples
-    iex> ToYaml.indent_level(0)
-    ""
+      iex> ToYaml.indent_level(0)
+      ""
 
-    iex> ToYaml.indent_level(1)
-    "  "
+      iex> ToYaml.indent_level(1)
+      "  "
 
-    iex> ToYaml.indent_level(2)
-    "    "
+      iex> ToYaml.indent_level(2)
+      "    "
   """
   @spec indent_level(number) :: String.t()
   def indent_level(level) when is_number(level) and level == 0, do: ""
